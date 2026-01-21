@@ -1,0 +1,27 @@
+{
+  "name": "@justitia/api",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@justitia/auth": "workspace:*",
+    "@justitia/db": "workspace:*",
+    "@justitia/env": "workspace:*",
+    "@trpc/client": "catalog:",
+    "@trpc/server": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@justitia/config": "workspace:*",
+    "hono": "catalog:",
+    "typescript": "^5"
+  }
+}

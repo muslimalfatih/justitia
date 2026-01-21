@@ -1,0 +1,24 @@
+{
+  "name": "@justitia/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@justitia/db": "workspace:*",
+    "@justitia/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@justitia/config": "workspace:*",
+    "typescript": "^5"
+  }
+}
