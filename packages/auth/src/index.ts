@@ -7,12 +7,31 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
-
     schema: schema,
   }),
   trustedOrigins: [env.CORS_ORIGIN],
   emailAndPassword: {
     enabled: true,
+  },
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: true,
+        defaultValue: "client",
+        input: true,
+      },
+      jurisdiction: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      barNumber: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+    },
   },
   advanced: {
     defaultCookieAttributes: {

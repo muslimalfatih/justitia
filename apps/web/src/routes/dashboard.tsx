@@ -1,31 +1,35 @@
-import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
 import { authClient } from "@/lib/auth-client";
-import { trpc } from "@/utils/trpc";
 
 export default function Dashboard() {
   const { data: session, isPending } = authClient.useSession();
   const navigate = useNavigate();
 
-  const privateData = useQuery(trpc.privateData.queryOptions());
-
   useEffect(() => {
-    if (!session && !isPending) {
-      navigate("/login");
+    if (!isPending) {
+      if (!session) {
+        navigate("/login");
+      } else {
+        // Redirect based on user role
+        const role = (session.user as any).role;
+        if (role === 'lawyer') {
+          navigate("/lawyer/marketplace");
+        } else {
+          navigate("/client/dashboard");
+        }
+      }
     }
   }, [session, isPending, navigate]);
 
   if (isPending) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
-  return (
-    <div>
-      <h1>Dashboard</h1>
-      <p>Welcome {session?.user.name}</p>
-      <p>API: {privateData.data?.message}</p>
-    </div>
-  );
+  return null;
 }
