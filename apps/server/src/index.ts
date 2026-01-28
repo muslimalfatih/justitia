@@ -3,7 +3,7 @@ import { createContext } from "@justitia/api/context";
 import { appRouter } from "@justitia/api/routers/index";
 import { auth } from "@justitia/auth";
 import { env } from "@justitia/env/server";
-import { db, files as filesSchema } from "@justitia/db";
+import { db, files as filesSchema, cases, eq } from "@justitia/db";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
@@ -60,8 +60,21 @@ app.post("/api/upload", async (c) => {
       return c.json({ error: "Missing caseId or file" }, 400);
     }
 
-    // Verify case ownership
-    // (Add case verification here if needed)
+    // Verify case ownership - client must own the case to upload files
+    const caseRecord = await db
+      .select()
+      .from(cases)
+      .where(eq(cases.id, caseId))
+      .limit(1);
+
+    const foundCase = caseRecord[0];
+    if (!foundCase) {
+      return c.json({ error: "Case not found" }, 404);
+    }
+
+    if (foundCase.clientId !== session.user.id) {
+      return c.json({ error: "Unauthorized: You do not own this case" }, 403);
+    }
 
     // Upload file
     const buffer = Buffer.from(await file.arrayBuffer());

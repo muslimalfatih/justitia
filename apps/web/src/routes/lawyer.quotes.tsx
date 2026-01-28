@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { authClient } from '@/lib/auth-client'
@@ -7,7 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
+
+type QuoteStatus = 'all' | 'proposed' | 'accepted' | 'rejected'
 
 interface Quote {
   id: string
@@ -27,6 +30,7 @@ export default function LawyerQuotes() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { data: session, isPending: sessionLoading } = authClient.useSession()
+  const [statusFilter, setStatusFilter] = useState<QuoteStatus>('all')
 
   useEffect(() => {
     if (!sessionLoading && (!session || (session.user as any).role !== 'lawyer')) {
@@ -38,6 +42,7 @@ export default function LawyerQuotes() {
     trpc.quotes.getMyQuotes.queryOptions({
       page: 1,
       pageSize: 20,
+      status: statusFilter === 'all' ? undefined : statusFilter,
     })
   )
 
@@ -84,10 +89,24 @@ export default function LawyerQuotes() {
         </Button>
       </div>
 
+      {/* Status Filter Tabs */}
+      <Tabs value={statusFilter} onValueChange={(v) => setStatusFilter(v as QuoteStatus)}>
+        <TabsList>
+          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="proposed">Proposed</TabsTrigger>
+          <TabsTrigger value="accepted">Accepted</TabsTrigger>
+          <TabsTrigger value="rejected">Rejected</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
       {quotes?.items.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground mb-4">You haven't submitted any quotes yet.</p>
+            <p className="text-muted-foreground mb-4">
+              {statusFilter === 'all' 
+                ? "You haven't submitted any quotes yet."
+                : `No ${statusFilter} quotes found.`}
+            </p>
             <Button onClick={() => navigate('/lawyer/marketplace')}>
               Browse Cases
             </Button>

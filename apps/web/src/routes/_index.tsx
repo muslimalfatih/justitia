@@ -40,13 +40,19 @@ export default function Home() {
             </Button>
           </div>
         ) : (
-          <div className="flex gap-4 justify-center">
-            <Button size="lg" onClick={() => navigate('/login')}>
-              Get Started
-            </Button>
-            <Button variant="outline" size="lg" onClick={() => navigate('/login')}>
-              Sign In
-            </Button>
+          <div className="flex flex-col gap-4 items-center">
+            <div className="flex gap-4">
+              <Button size="lg" onClick={() => navigate('/signup/client')}>
+                I Need a Lawyer
+              </Button>
+              <Button size="lg" variant="outline" onClick={() => navigate('/signup/lawyer')}>
+                I'm a Lawyer
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Already have an account?{" "}
+              <a href="/login" className="text-primary hover:underline">Sign In</a>
+            </p>
           </div>
         )}
       </div>

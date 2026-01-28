@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { authClient } from '@/lib/auth-client'
 import { trpc, trpcClient } from '@/utils/trpc'
+import { redactSensitiveInfo } from '@/lib/redact'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -34,6 +35,27 @@ const CASE_CATEGORIES = [
   { value: 'other', label: 'Other' },
 ]
 
+const DATE_FILTERS = [
+  { value: 'all', label: 'All Time' },
+  { value: 'today', label: 'Today' },
+  { value: 'week', label: 'Last 7 Days' },
+  { value: 'month', label: 'Last 30 Days' },
+]
+
+function getDateFilterValue(filter: string): string | undefined {
+  const now = new Date()
+  switch (filter) {
+    case 'today':
+      return new Date(now.setHours(0, 0, 0, 0)).toISOString()
+    case 'week':
+      return new Date(now.setDate(now.getDate() - 7)).toISOString()
+    case 'month':
+      return new Date(now.setDate(now.getDate() - 30)).toISOString()
+    default:
+      return undefined
+  }
+}
+
 interface MarketplaceCase {
   id: string
   title: string
@@ -49,6 +71,7 @@ export default function LawyerMarketplace() {
   const queryClient = useQueryClient()
   const { data: session, isPending: sessionLoading } = authClient.useSession()
   const [categoryFilter, setCategoryFilter] = useState('All')
+  const [dateFilter, setDateFilter] = useState('all')
   const [selectedCase, setSelectedCase] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
 
@@ -69,6 +92,7 @@ export default function LawyerMarketplace() {
       page: 1,
       pageSize: 20,
       category: categoryFilter === 'All' ? undefined : categoryFilter as any,
+      createdSince: getDateFilterValue(dateFilter),
     })
   )
 
@@ -129,20 +153,37 @@ export default function LawyerMarketplace() {
         </Button>
       </div>
 
-      <div className="flex gap-4 items-center">
-        <Label htmlFor="category-filter">Filter by category:</Label>
-        <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value || 'All')}>
-          <SelectTrigger id="category-filter" className="w-50">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {CASE_CATEGORIES.map((category) => (
-              <SelectItem key={category.value} value={category.value}>
-                {category.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="flex gap-4 items-center flex-wrap">
+        <div className="flex gap-2 items-center">
+          <Label htmlFor="category-filter">Category:</Label>
+          <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value || 'All')}>
+            <SelectTrigger id="category-filter" className="w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CASE_CATEGORIES.map((category) => (
+                <SelectItem key={category.value} value={category.value}>
+                  {category.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex gap-2 items-center">
+          <Label htmlFor="date-filter">Posted:</Label>
+          <Select value={dateFilter} onValueChange={(value) => setDateFilter(value || 'all')}>
+            <SelectTrigger id="date-filter" className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {DATE_FILTERS.map((filter) => (
+                <SelectItem key={filter.value} value={filter.value}>
+                  {filter.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {cases?.items.length === 0 ? (
@@ -165,7 +206,7 @@ export default function LawyerMarketplace() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm">{caseItem.description}</p>
+                <p className="text-sm line-clamp-3">{redactSensitiveInfo(caseItem.description)}</p>
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-muted-foreground space-x-4">
                     <span>💬 {caseItem.quoteCount} quotes</span>
