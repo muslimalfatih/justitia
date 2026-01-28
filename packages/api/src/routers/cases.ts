@@ -241,6 +241,11 @@ export const casesRouter = t.router({
           status: cases.status,
           createdAt: cases.createdAt,
           quoteCount: sql<number>`COUNT(DISTINCT ${quotes.id})`.as('quote_count'),
+          hasSubmittedQuote: sql<boolean>`EXISTS (
+            SELECT 1 FROM ${quotes} 
+            WHERE ${quotes.caseId} = ${cases.id} 
+            AND ${quotes.lawyerId} = ${ctx.session.user.id}
+          )`.as('has_submitted_quote'),
         })
         .from(cases)
         .leftJoin(quotes, eq(quotes.caseId, cases.id))

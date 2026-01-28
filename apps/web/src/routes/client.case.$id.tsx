@@ -128,10 +128,13 @@ export default function ClientCaseDetail() {
     )
   )
 
-  const { data: paymentStatus } = useQuery(
+  const { data: paymentStatus, refetch: refetchPaymentStatus } = useQuery(
     trpc.payments.getPaymentStatus.queryOptions(
       { caseId: caseId! },
-      { enabled: !!caseId }
+      { 
+        enabled: !!caseId,
+        refetchInterval: caseData?.case?.status === 'engaged' ? 3000 : false, // Poll every 3s when engaged
+      }
     )
   )
 

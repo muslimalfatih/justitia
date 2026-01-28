@@ -64,6 +64,7 @@ interface MarketplaceCase {
   status: string
   quoteCount: number
   createdAt: string
+  hasSubmittedQuote: boolean
 }
 
 export default function LawyerMarketplace() {
@@ -212,14 +213,20 @@ export default function LawyerMarketplace() {
                     <span>💬 {caseItem.quoteCount} quotes</span>
                     <span>📅 Posted {new Date(caseItem.createdAt).toLocaleDateString()}</span>
                   </div>
-                  <Button
-                    onClick={() => {
-                      setSelectedCase(caseItem.id)
-                      setDialogOpen(true)
-                    }}
-                  >
-                    Submit Quote
-                  </Button>
+                  {caseItem.hasSubmittedQuote ? (
+                    <Badge variant="secondary" className="px-4 py-2">
+                      ✓ Quote Submitted
+                    </Badge>
+                  ) : (
+                    <Button
+                      onClick={() => {
+                        setSelectedCase(caseItem.id)
+                        setDialogOpen(true)
+                      }}
+                    >
+                      Submit Quote
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
