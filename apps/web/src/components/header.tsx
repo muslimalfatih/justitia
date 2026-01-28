@@ -1,7 +1,6 @@
 import { NavLink } from "react-router";
 
 import { authClient } from "@/lib/auth-client";
-import { ModeToggle } from "./mode-toggle";
 import UserMenu from "./user-menu";
 
 export default function Header() {
@@ -44,7 +43,6 @@ export default function Header() {
           })}
         </nav>
         <div className="flex items-center gap-3">
-          <ModeToggle />
           <UserMenu />
         </div>
       </div>

@@ -95,27 +95,41 @@ export default function LawyerQuotes() {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {quotes?.items.map((quote: Quote) => (
-            <Card key={quote.id} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div className="space-y-1">
-                    <CardTitle className="text-xl">{quote.case.title}</CardTitle>
-                    <CardDescription>{quote.case.category}</CardDescription>
+          {quotes?.items.map((quote: Quote) => {
+            const isAccepted = quote.status === 'accepted'
+            const isRejected = quote.status === 'rejected'
+            
+            return (
+              <Card 
+                key={quote.id} 
+                className={`hover:shadow-md transition-shadow ${
+                  isAccepted 
+                    ? 'border-green-500 bg-green-50 dark:bg-green-950' 
+                    : isRejected 
+                      ? 'opacity-60' 
+                      : ''
+                }`}
+              >
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <CardTitle className="text-xl">{quote.case.title}</CardTitle>
+                      <CardDescription>{quote.case.category}</CardDescription>
+                    </div>
+                    <Badge
+                      variant={
+                        isAccepted
+                          ? 'default'
+                          : quote.status === 'proposed'
+                            ? 'secondary'
+                            : 'destructive'
+                      }
+                      className={isAccepted ? 'bg-green-600' : ''}
+                    >
+                      {isAccepted ? '✓ Accepted & Paid' : quote.status}
+                    </Badge>
                   </div>
-                  <Badge
-                    variant={
-                      quote.status === 'accepted'
-                        ? 'default'
-                        : quote.status === 'proposed'
-                          ? 'secondary'
-                          : 'outline'
-                    }
-                  >
-                    {quote.status}
-                  </Badge>
-                </div>
-              </CardHeader>
+                </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
@@ -152,14 +166,15 @@ export default function LawyerQuotes() {
                     )}
                     {quote.status === 'accepted' && (
                       <Button size="sm" onClick={() => navigate(`/lawyer/case/${quote.case.id}`)}>
-                        View Case
+                        View Case Details
                       </Button>
                     )}
                   </div>
                 </div>
               </CardContent>
             </Card>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

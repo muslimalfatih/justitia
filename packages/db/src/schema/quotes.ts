@@ -11,7 +11,7 @@ export const quotes = pgTable('quotes', {
   caseId: uuid('case_id')
     .notNull()
     .references(() => cases.id, { onDelete: 'cascade' }),
-  lawyerId: uuid('lawyer_id')
+  lawyerId: text('lawyer_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
@@ -42,10 +42,10 @@ export const payments = pgTable('payments', {
   quoteId: uuid('quote_id')
     .notNull()
     .references(() => quotes.id, { onDelete: 'cascade' }),
-  clientId: uuid('client_id')
+  clientId: text('client_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
-  lawyerId: uuid('lawyer_id')
+  lawyerId: text('lawyer_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),

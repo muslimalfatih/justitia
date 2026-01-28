@@ -4,7 +4,7 @@ import { user } from './auth'
 
 export const auditLogs = pgTable('audit_logs', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => user.id, { onDelete: 'set null' }),
+  userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
   action: varchar('action', { length: 100 }).notNull(),
   resourceType: varchar('resource_type', { length: 50 }).notNull(),
   resourceId: uuid('resource_id').notNull(),

@@ -35,8 +35,15 @@ interface QuoteItem {
   amount: string
   expectedDays: number
   note: string | null
-  status: string
+  status: 'proposed' | 'accepted' | 'rejected'
   createdAt: string
+  lawyerName?: string
+}
+
+interface PaymentInfo {
+  id: string
+  status: 'pending' | 'succeeded' | 'failed'
+  amount: string
 }
 
 function PaymentForm({
@@ -121,6 +128,13 @@ export default function ClientCaseDetail() {
     )
   )
 
+  const { data: paymentStatus } = useQuery(
+    trpc.payments.getPaymentStatus.queryOptions(
+      { caseId: caseId! },
+      { enabled: !!caseId }
+    )
+  )
+
   const createPaymentIntentMutation = useMutation({
     mutationFn: (data: { quoteId: string }) => trpcClient.payments.createIntent.mutate(data),
     onSuccess: (data: { clientSecret: string; paymentIntentId: string }) => {
@@ -175,8 +189,30 @@ export default function ClientCaseDetail() {
 
   const { case: caseInfo, files, quotes: caseQuotes } = caseData
 
+  const isEngaged = caseInfo.status === 'engaged'
+  const isPaid = paymentStatus?.status === 'succeeded'
+
   return (
     <div className="container mx-auto py-8 space-y-6">
+      {/* Success Banner for Engaged Cases */}
+      {isEngaged && isPaid && (
+        <Card className="border-green-500 bg-green-50 dark:bg-green-950">
+          <CardContent className="py-4">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">✅</span>
+              <div>
+                <p className="font-semibold text-green-700 dark:text-green-300">
+                  Payment Successful - Lawyer Assigned
+                </p>
+                <p className="text-sm text-green-600 dark:text-green-400">
+                  Your lawyer now has access to your case documents and will begin working on your case.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">{caseInfo.title}</h1>
@@ -262,8 +298,8 @@ export default function ClientCaseDetail() {
             {caseInfo.status === 'open'
               ? 'Review and accept a quote to proceed'
               : caseInfo.status === 'engaged'
-                ? 'A quote has been accepted for this case'
-                : 'No more quotes accepted'}
+                ? 'Payment completed - your lawyer is now assigned'
+                : 'Case closed'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -273,50 +309,73 @@ export default function ClientCaseDetail() {
             </p>
           ) : (
             <div className="space-y-4">
-              {quotes.map((quote: QuoteItem) => (
-                <div
-                  key={quote.id}
-                  className={`p-4 border rounded-lg ${
-                    quote.status === 'accepted' ? 'border-green-500 bg-green-50' : ''
-                  }`}
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-4">
-                        <span className="text-2xl font-bold">
-                          ${parseFloat(quote.amount).toLocaleString()}
-                        </span>
-                        <Badge variant="outline">{quote.expectedDays} days</Badge>
-                        <Badge
-                          variant={
-                            quote.status === 'accepted'
-                              ? 'default'
-                              : quote.status === 'rejected'
-                                ? 'destructive'
-                                : 'secondary'
-                          }
-                        >
-                          {quote.status}
-                        </Badge>
+              {quotes.map((quote: QuoteItem) => {
+                const isAccepted = quote.status === 'accepted'
+                const isRejected = quote.status === 'rejected'
+                const isPaid = paymentStatus?.status === 'succeeded'
+                const isPending = paymentStatus?.status === 'pending'
+                
+                return (
+                  <div
+                    key={quote.id}
+                    className={`p-4 border rounded-lg ${
+                      isAccepted 
+                        ? 'border-green-500 bg-green-50 dark:bg-green-950' 
+                        : isRejected
+                          ? 'border-muted bg-muted/50 opacity-60'
+                          : ''
+                    }`}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-4">
+                          <span className="text-2xl font-bold">
+                            ${parseFloat(quote.amount).toLocaleString()}
+                          </span>
+                          <Badge variant="outline">{quote.expectedDays} days</Badge>
+                          <Badge
+                            variant={
+                              isAccepted
+                                ? 'default'
+                                : isRejected
+                                  ? 'destructive'
+                                  : 'secondary'
+                            }
+                          >
+                            {isAccepted && isPaid ? '✓ Paid' : quote.status}
+                          </Badge>
+                        </div>
+                        {quote.note && (
+                          <p className="text-sm text-muted-foreground">{quote.note}</p>
+                        )}
+                        <p className="text-xs text-muted-foreground">
+                          Received {new Date(quote.createdAt).toLocaleDateString()}
+                        </p>
                       </div>
-                      {quote.note && (
-                        <p className="text-sm text-muted-foreground">{quote.note}</p>
-                      )}
-                      <p className="text-xs text-muted-foreground">
-                        Received {new Date(quote.createdAt).toLocaleDateString()}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        {isAccepted && isPaid && (
+                          <span className="text-sm text-green-600 font-medium">
+                            ✓ Payment Complete
+                          </span>
+                        )}
+                        {isAccepted && isPending && (
+                          <span className="text-sm text-yellow-600 font-medium">
+                            Payment Processing...
+                          </span>
+                        )}
+                        {caseInfo.status === 'open' && quote.status === 'proposed' && (
+                          <Button
+                            onClick={() => handleAcceptQuote(quote.id)}
+                            disabled={createPaymentIntentMutation.isPending}
+                          >
+                            Accept & Pay
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                    {caseInfo.status === 'open' && quote.status === 'proposed' && (
-                      <Button
-                        onClick={() => handleAcceptQuote(quote.id)}
-                        disabled={createPaymentIntentMutation.isPending}
-                      >
-                        Accept & Pay
-                      </Button>
-                    )}
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </CardContent>

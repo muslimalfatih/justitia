@@ -72,42 +72,47 @@ export default function ClientDashboard() {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {(cases?.items as unknown as CaseItem[])?.map((caseItem) => (
-            <Card key={caseItem.id} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div className="space-y-1">
-                    <CardTitle className="text-xl">{caseItem.title}</CardTitle>
-                    <CardDescription>{caseItem.category}</CardDescription>
+          {(cases?.items as unknown as CaseItem[])?.map((caseItem) => {
+            const isEngaged = caseItem.status === 'engaged'
+            const isOpen = caseItem.status === 'open'
+            
+            return (
+              <Card 
+                key={caseItem.id} 
+                className={`hover:shadow-md transition-shadow ${
+                  isEngaged ? 'border-green-500' : ''
+                }`}
+              >
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <CardTitle className="text-xl">{caseItem.title}</CardTitle>
+                      <CardDescription>{caseItem.category}</CardDescription>
+                    </div>
+                    <Badge
+                      variant={isOpen ? 'default' : isEngaged ? 'secondary' : 'outline'}
+                      className={isEngaged ? 'bg-green-600 text-white' : ''}
+                    >
+                      {isEngaged ? '✓ Lawyer Assigned' : caseItem.status}
+                    </Badge>
                   </div>
-                  <Badge
-                    variant={
-                      caseItem.status === 'open'
-                        ? 'default'
-                        : caseItem.status === 'engaged'
-                          ? 'secondary'
-                          : 'outline'
-                    }
-                  >
-                    {caseItem.status}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm line-clamp-2">{caseItem.description}</p>
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-muted-foreground space-x-4">
-                    <span>📄 {caseItem.fileCount} files</span>
-                    <span>💬 {caseItem.quoteCount} quotes</span>
-                    <span>📅 {new Date(caseItem.createdAt).toLocaleDateString()}</span>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm line-clamp-2">{caseItem.description}</p>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-muted-foreground space-x-4">
+                      <span>📄 {caseItem.fileCount} files</span>
+                      <span>💬 {caseItem.quoteCount} quotes</span>
+                      <span>📅 {new Date(caseItem.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <Button variant="outline" onClick={() => navigate(`/client/case/${caseItem.id}`)}>
+                      View Details
+                    </Button>
                   </div>
-                  <Button variant="outline" onClick={() => navigate(`/client/case/${caseItem.id}`)}>
-                    View Details
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
       )}
 

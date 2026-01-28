@@ -18,7 +18,7 @@ export const caseCategoryEnum = pgEnum('case_category', [
 
 export const cases = pgTable('cases', {
   id: uuid('id').primaryKey().defaultRandom(),
-  clientId: uuid('client_id')
+  clientId: text('client_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
