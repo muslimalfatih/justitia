@@ -26,8 +26,12 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
           password: value.password,
         },
         {
-          onSuccess: () => {
-            navigate("/dashboard");
+          onSuccess: async () => {
+            // Fetch session to get user role
+            const session = await authClient.getSession();
+            const role = (session?.data?.user as any)?.role || 'client';
+            const redirectPath = role === 'lawyer' ? '/lawyer/marketplace' : '/client/dashboard';
+            navigate(redirectPath);
             toast.success("Sign in successful");
           },
           onError: (error) => {
