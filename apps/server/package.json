@@ -10,15 +10,19 @@
     "start": "bun run dist/index.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.972.0",
+    "@aws-sdk/s3-request-presigner": "^3.972.0",
     "@hono/trpc-server": "^0.4.0",
     "@justitia/api": "workspace:*",
     "@justitia/auth": "workspace:*",
     "@justitia/db": "workspace:*",
     "@justitia/env": "workspace:*",
+    "@justitia/services": "workspace:*",
     "@trpc/server": "catalog:",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
     "hono": "catalog:",
+    "stripe": "^20.2.0",
     "zod": "catalog:"
   },
   "devDependencies": {
