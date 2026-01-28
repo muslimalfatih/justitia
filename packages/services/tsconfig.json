@@ -1,0 +1,12 @@
+{
+  "extends": "@justitia/config/tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "lib": ["ESNext"],
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "bundler"
+  },
+  "include": ["src"]
+}

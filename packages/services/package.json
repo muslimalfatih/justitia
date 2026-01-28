@@ -1,0 +1,26 @@
+{
+  "name": "@justitia/services",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.972.0",
+    "@aws-sdk/s3-request-presigner": "^3.972.0",
+    "@justitia/db": "workspace:*",
+    "@justitia/env": "workspace:*",
+    "@trpc/server": "catalog:",
+    "drizzle-orm": "^0.45.1",
+    "stripe": "^20.2.0"
+  },
+  "devDependencies": {
+    "@justitia/config": "workspace:*",
+    "typescript": "^5"
+  }
+}
