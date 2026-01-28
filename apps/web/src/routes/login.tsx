@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { Loader2 } from "lucide-react";
 
 import { authClient } from "@/lib/auth-client";
 import SignInForm from "@/components/sign-in-form";
@@ -22,9 +23,16 @@ export default function Login() {
     }
   }, [session, isPending, navigate]);
 
-  // Show nothing while checking session
+  // Show loading while checking session
   if (isPending) {
-    return null;
+    return (
+      <div className="min-h-[calc(100vh-80px)] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   // If logged in, will redirect (show nothing to prevent flash)

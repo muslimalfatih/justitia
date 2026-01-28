@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
+import { Plus, FileText, MessageSquare, Calendar, ArrowRight, Briefcase, CheckCircle2 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { trpc } from '@/utils/trpc'
 import { Button } from '@/components/ui/button'
@@ -38,9 +39,18 @@ export default function ClientDashboard() {
   if (sessionLoading || isLoading) {
     return (
       <div className="container mx-auto py-8 space-y-6">
-        <Skeleton className="h-12 w-64" />
-        <Skeleton className="h-32 w-full" />
-        <Skeleton className="h-32 w-full" />
+        <div className="flex justify-between items-center">
+          <div>
+            <Skeleton className="h-10 w-48 mb-2" />
+            <Skeleton className="h-5 w-64" />
+          </div>
+          <Skeleton className="h-12 w-40 rounded-xl" />
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-48 w-full rounded-2xl" />
+          ))}
+        </div>
       </div>
     )
   }
@@ -50,22 +60,27 @@ export default function ClientDashboard() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="container mx-auto py-8 space-y-8">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">My Cases</h1>
-          <p className="text-muted-foreground">Manage your legal case requests</p>
+          <p className="text-muted-foreground mt-1">Manage your legal case requests</p>
         </div>
         <Button onClick={() => navigate('/client/create-case')}>
+          <Plus className="w-4 h-4 mr-2" />
           Create New Case
         </Button>
       </div>
 
       {cases?.items.length === 0 ? (
         <Card>
-          <CardContent className="py-12 text-center">
+          <CardContent className="py-16 text-center">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+              <Briefcase className="w-8 h-8 text-muted-foreground" />
+            </div>
             <p className="text-muted-foreground mb-4">You haven't created any cases yet.</p>
             <Button onClick={() => navigate('/client/create-case')}>
+              <Plus className="w-4 h-4 mr-2" />
               Create Your First Case
             </Button>
           </CardContent>
@@ -78,35 +93,53 @@ export default function ClientDashboard() {
             
             return (
               <Card 
-                key={caseItem.id} 
-                className={`hover:shadow-md transition-shadow ${
-                  isEngaged ? 'border-green-500' : ''
+                key={caseItem.id}
+                className={`cursor-pointer hover:bg-muted/50 transition-colors ${
+                  isEngaged ? 'border-l-4 border-l-green-500' : ''
                 }`}
+                onClick={() => navigate(`/client/case/${caseItem.id}`)}
               >
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div className="space-y-1">
-                      <CardTitle className="text-xl">{caseItem.title}</CardTitle>
+                      <CardTitle>{caseItem.title}</CardTitle>
                       <CardDescription>{caseItem.category}</CardDescription>
                     </div>
                     <Badge
-                      variant={isOpen ? 'default' : isEngaged ? 'secondary' : 'outline'}
-                      className={isEngaged ? 'bg-green-600 text-white' : ''}
+                      variant={isEngaged ? 'default' : isOpen ? 'secondary' : 'outline'}
                     >
-                      {isEngaged ? '✓ Lawyer Assigned' : caseItem.status}
+                      {isEngaged && <CheckCircle2 className="w-3 h-3 mr-1" />}
+                      {isEngaged ? 'Lawyer Assigned' : caseItem.status.charAt(0).toUpperCase() + caseItem.status.slice(1)}
                     </Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-sm line-clamp-2">{caseItem.description}</p>
+                  <p className="text-sm text-muted-foreground line-clamp-2">{caseItem.description}</p>
                   <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground space-x-4">
-                      <span>📄 {caseItem.fileCount} files</span>
-                      <span>💬 {caseItem.quoteCount} quotes</span>
-                      <span>📅 {new Date(caseItem.createdAt).toLocaleDateString()}</span>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <FileText className="w-4 h-4" />
+                        {caseItem.fileCount} files
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MessageSquare className="w-4 h-4" />
+                        {caseItem.quoteCount} quotes
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        {new Date(caseItem.createdAt).toLocaleDateString()}
+                      </span>
                     </div>
-                    <Button variant="outline" onClick={() => navigate(`/client/case/${caseItem.id}`)}>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        navigate(`/client/case/${caseItem.id}`)
+                      }}
+                    >
                       View Details
+                      <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
                   </div>
                 </CardContent>

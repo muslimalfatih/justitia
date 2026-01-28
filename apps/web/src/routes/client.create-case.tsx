@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useMutation } from '@tanstack/react-query'
+import { FileText, Upload, Tag, AlignLeft, ArrowLeft, Plus, Paperclip, X, Loader2 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { trpcClient } from '@/utils/trpc'
 import { Button } from '@/components/ui/button'
@@ -118,27 +119,38 @@ export default function CreateCase() {
   }
 
   if (sessionLoading) {
-    return null
+    return (
+      <div className="min-h-[calc(100vh-80px)] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    )
   }
 
   return (
     <div className="container mx-auto py-8 max-w-2xl">
       <Card>
-        <CardHeader>
+        <CardHeader className="text-center">
+          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+            <Plus className="w-6 h-6 text-primary" />
+          </div>
           <CardTitle>Create New Case</CardTitle>
           <CardDescription>Submit your legal case for lawyer quotes</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="title">Case Title *</Label>
-              <Input
-                id="title"
-                placeholder="Brief description of your legal issue"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                required
-              />
+              <div className="relative">
+                <FileText className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="title"
+                  placeholder="Brief description of your legal issue"
+                  className="pl-9"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  required
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -148,11 +160,14 @@ export default function CreateCase() {
                 onValueChange={(value) => setFormData({ ...formData, category: value || '' })}
               >
                 <SelectTrigger id="category">
-                  <SelectValue placeholder="Select a category" />
+                  <div className="flex items-center gap-2">
+                    <Tag className="h-4 w-4 text-muted-foreground" />
+                    <SelectValue placeholder="Select a category" />
+                  </div>
                 </SelectTrigger>
                 <SelectContent>
                   {CASE_CATEGORIES.map((category) => (
-                    <SelectItem key={category.value} value={category.value}>
+                    <SelectItem key={category.value} value={category.value} className="capitalize">
                       {category.label}
                     </SelectItem>
                   ))}
@@ -162,14 +177,17 @@ export default function CreateCase() {
 
             <div className="space-y-2">
               <Label htmlFor="description">Detailed Description *</Label>
-              <Textarea
-                id="description"
-                placeholder="Provide detailed information about your case..."
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={6}
-                required
-              />
+              <div className="relative">
+                <AlignLeft className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Textarea
+                  id="description"
+                  placeholder="Provide detailed information about your case..."
+                  className="pl-9 min-h-32"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  required
+                />
+              </div>
               <p className="text-xs text-muted-foreground">
                 Include relevant facts, dates, and any specific legal questions you have
               </p>
@@ -177,44 +195,73 @@ export default function CreateCase() {
 
             <div className="space-y-2">
               <Label htmlFor="files">Supporting Documents</Label>
-              <Input
-                id="files"
-                type="file"
-                multiple
-                accept=".pdf,image/*"
-                onChange={handleFileChange}
-              />
-              <p className="text-xs text-muted-foreground">
-                Upload relevant documents (PDF or images, max 10MB each)
-              </p>
+              <div className="relative">
+                <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/50 transition-colors cursor-pointer">
+                  <input
+                    id="files"
+                    type="file"
+                    multiple
+                    accept=".pdf,image/*"
+                    onChange={handleFileChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Drag and drop files here, or click to browse
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    PDF or images, max 10MB each
+                  </p>
+                </div>
+              </div>
               {files.length > 0 && (
-                <div className="mt-2 space-y-1">
+                <div className="mt-3 space-y-2">
                   {files.map((file, idx) => (
-                    <div key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
-                      <span>📎</span>
-                      <span>{file.name}</span>
-                      <span className="text-xs">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                    <div key={idx} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                      <Paperclip className="w-4 h-4 text-muted-foreground" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{file.name}</p>
+                        <p className="text-xs text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setFiles(files.filter((_, i) => i !== idx))}
+                        className="p-1 hover:bg-background rounded"
+                      >
+                        <X className="w-4 h-4 text-muted-foreground" />
+                      </button>
                     </div>
                   ))}
                 </div>
               )}
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-3 pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => navigate('/client/dashboard')}
                 disabled={createCaseMutation.isPending || uploading}
               >
+                <ArrowLeft className="w-4 h-4 mr-2" />
                 Cancel
               </Button>
-              <Button type="submit" disabled={createCaseMutation.isPending || uploading} className="flex-1">
-                {createCaseMutation.isPending
-                  ? 'Creating...'
-                  : uploading
-                    ? 'Uploading files...'
-                    : 'Create Case'}
+              <Button 
+                type="submit" 
+                disabled={createCaseMutation.isPending || uploading} 
+                className="flex-1"
+              >
+                {createCaseMutation.isPending || uploading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {createCaseMutation.isPending ? 'Creating...' : 'Uploading files...'}
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Case
+                  </>
+                )}
               </Button>
             </div>
           </form>

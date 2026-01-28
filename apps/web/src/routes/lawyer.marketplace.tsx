@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { MessageSquare, Calendar, Send, Filter, Clock, DollarSign, FileText, CheckCircle2, Search, Loader2 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { trpc, trpcClient } from '@/utils/trpc'
 import { redactSensitiveInfo } from '@/lib/redact'
@@ -131,9 +132,22 @@ export default function LawyerMarketplace() {
   if (sessionLoading || isLoading) {
     return (
       <div className="container mx-auto py-8 space-y-6">
-        <Skeleton className="h-12 w-64" />
-        <Skeleton className="h-32 w-full" />
-        <Skeleton className="h-32 w-full" />
+        <div className="flex justify-between items-center">
+          <div>
+            <Skeleton className="h-10 w-56 mb-2" />
+            <Skeleton className="h-5 w-72" />
+          </div>
+          <Skeleton className="h-12 w-32 rounded-xl" />
+        </div>
+        <div className="flex gap-4">
+          <Skeleton className="h-12 w-56 rounded-xl" />
+          <Skeleton className="h-12 w-48 rounded-xl" />
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-48 w-full rounded-2xl" />
+          ))}
+        </div>
       </div>
     )
   }
@@ -147,75 +161,86 @@ export default function LawyerMarketplace() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Case Marketplace</h1>
-          <p className="text-muted-foreground">Browse and submit quotes for legal cases</p>
+          <p className="text-muted-foreground mt-1">Browse and submit quotes for legal cases</p>
         </div>
         <Button variant="outline" onClick={() => navigate('/lawyer/quotes')}>
+          <FileText className="w-4 h-4 mr-2" />
           My Quotes
         </Button>
       </div>
 
-      <div className="flex gap-4 items-center flex-wrap">
-        <div className="flex gap-2 items-center">
-          <Label htmlFor="category-filter">Category:</Label>
-          <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value || 'All')}>
-            <SelectTrigger id="category-filter" className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {CASE_CATEGORIES.map((category) => (
-                <SelectItem key={category.value} value={category.value}>
-                  {category.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <div className="flex gap-4 items-center flex-wrap border rounded-lg p-4">
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-muted-foreground">Filters:</span>
         </div>
-        <div className="flex gap-2 items-center">
-          <Label htmlFor="date-filter">Posted:</Label>
-          <Select value={dateFilter} onValueChange={(value) => setDateFilter(value || 'all')}>
-            <SelectTrigger id="date-filter" className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {DATE_FILTERS.map((filter) => (
-                <SelectItem key={filter.value} value={filter.value}>
-                  {filter.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value || 'All')}>
+          <SelectTrigger className="w-48">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {CASE_CATEGORIES.map((category) => (
+              <SelectItem key={category.value} value={category.value}>
+                {category.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={dateFilter} onValueChange={(value) => setDateFilter(value || 'all')}>
+          <SelectTrigger className="w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {DATE_FILTERS.map((filter) => (
+              <SelectItem key={filter.value} value={filter.value}>
+                {filter.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {cases?.items.length === 0 ? (
         <Card>
-          <CardContent className="py-12 text-center">
+          <CardContent className="py-16 text-center">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+              <Search className="w-8 h-8 text-muted-foreground" />
+            </div>
             <p className="text-muted-foreground">No cases available matching your criteria.</p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4">
           {(cases?.items as unknown as MarketplaceCase[])?.map((caseItem) => (
-            <Card key={caseItem.id} className="hover:shadow-md transition-shadow">
+            <Card key={caseItem.id} className="hover:bg-muted/50 transition-colors">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
-                    <CardTitle className="text-xl">{caseItem.title}</CardTitle>
+                    <CardTitle>{caseItem.title}</CardTitle>
                     <CardDescription>{caseItem.category}</CardDescription>
                   </div>
-                  <Badge variant="default">{caseItem.status}</Badge>
+                  <Badge variant="secondary">
+                    {caseItem.status.charAt(0).toUpperCase() + caseItem.status.slice(1)}
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm line-clamp-3">{redactSensitiveInfo(caseItem.description)}</p>
+                <p className="text-sm text-muted-foreground line-clamp-3">{redactSensitiveInfo(caseItem.description)}</p>
                 <div className="flex items-center justify-between">
-                  <div className="text-sm text-muted-foreground space-x-4">
-                    <span>💬 {caseItem.quoteCount} quotes</span>
-                    <span>📅 Posted {new Date(caseItem.createdAt).toLocaleDateString()}</span>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <MessageSquare className="w-4 h-4" />
+                      {caseItem.quoteCount} quotes
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-4 h-4" />
+                      Posted {new Date(caseItem.createdAt).toLocaleDateString()}
+                    </span>
                   </div>
                   {caseItem.hasSubmittedQuote ? (
-                    <Badge variant="secondary" className="px-4 py-2">
-                      ✓ Quote Submitted
+                    <Badge variant="default">
+                      <CheckCircle2 className="w-3 h-3 mr-1" />
+                      Quote Submitted
                     </Badge>
                   ) : (
                     <Button
@@ -224,6 +249,7 @@ export default function LawyerMarketplace() {
                         setDialogOpen(true)
                       }}
                     >
+                      <Send className="w-4 h-4 mr-2" />
                       Submit Quote
                     </Button>
                   )}
@@ -235,7 +261,7 @@ export default function LawyerMarketplace() {
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Submit Quote</DialogTitle>
             <DialogDescription>
@@ -243,32 +269,40 @@ export default function LawyerMarketplace() {
               decision.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmitQuote} className="space-y-4">
+          <form onSubmit={handleSubmitQuote} className="space-y-4 mt-4">
             <div className="space-y-2">
               <Label htmlFor="amount">Fee Amount (USD) *</Label>
-              <Input
-                id="amount"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="1000.00"
-                value={quoteForm.amount}
-                onChange={(e) => setQuoteForm({ ...quoteForm, amount: e.target.value })}
-                required
-              />
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="amount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="1000.00"
+                  className="pl-9"
+                  value={quoteForm.amount}
+                  onChange={(e) => setQuoteForm({ ...quoteForm, amount: e.target.value })}
+                  required
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="expectedDays">Expected Days to Complete *</Label>
-              <Input
-                id="expectedDays"
-                type="number"
-                min="1"
-                placeholder="30"
-                value={quoteForm.expectedDays}
-                onChange={(e) => setQuoteForm({ ...quoteForm, expectedDays: e.target.value })}
-                required
-              />
+              <div className="relative">
+                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="expectedDays"
+                  type="number"
+                  min="1"
+                  placeholder="30"
+                  className="pl-9"
+                  value={quoteForm.expectedDays}
+                  onChange={(e) => setQuoteForm({ ...quoteForm, expectedDays: e.target.value })}
+                  required
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -276,13 +310,13 @@ export default function LawyerMarketplace() {
               <Textarea
                 id="note"
                 placeholder="Explain your approach, experience, or any clarifications..."
+                className="min-h-24"
                 value={quoteForm.note}
                 onChange={(e) => setQuoteForm({ ...quoteForm, note: e.target.value })}
-                rows={4}
               />
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-3 pt-2">
               <Button
                 type="button"
                 variant="outline"
@@ -294,8 +328,22 @@ export default function LawyerMarketplace() {
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={submitQuoteMutation.isPending} className="flex-1">
-                {submitQuoteMutation.isPending ? 'Submitting...' : 'Submit Quote'}
+              <Button 
+                type="submit" 
+                disabled={submitQuoteMutation.isPending} 
+                className="flex-1"
+              >
+                {submitQuoteMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-2" />
+                    Submit Quote
+                  </>
+                )}
               </Button>
             </div>
           </form>

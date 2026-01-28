@@ -39,6 +39,7 @@
   "devDependencies": {
     "@justitia/config": "workspace:*",
     "@types/bun": "catalog:",
+    "shadcn": "^3.7.0",
     "turbo": "^2.6.3",
     "typescript": "^5"
   },
