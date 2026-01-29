@@ -39,7 +39,9 @@ export default function Header({ transparent = false }: HeaderProps) {
       className={cn(
         "sticky top-0 z-50 transition-colors",
         transparent
-          ? "bg-transparent border-transparent"
+          ? mobileMenuOpen
+            ? "bg-black/80 backdrop-blur-md border-transparent"
+            : "bg-transparent border-transparent"
           : "bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 border-b"
       )}
     >

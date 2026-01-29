@@ -131,21 +131,21 @@ export default function LawyerMarketplace() {
 
   if (sessionLoading || isLoading) {
     return (
-      <div className="container mx-auto py-8 space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <Skeleton className="h-10 w-56 mb-2" />
-            <Skeleton className="h-5 w-72" />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-8 sm:h-10 w-44 sm:w-56" />
+            <Skeleton className="h-4 sm:h-5 w-56 sm:w-72" />
           </div>
-          <Skeleton className="h-12 w-32 rounded-xl" />
+          <Skeleton className="h-10 sm:h-12 w-full sm:w-32 rounded-xl" />
         </div>
-        <div className="flex gap-4">
-          <Skeleton className="h-12 w-56 rounded-xl" />
-          <Skeleton className="h-12 w-48 rounded-xl" />
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-3 sm:p-4 border rounded-lg">
+          <Skeleton className="h-10 sm:h-12 w-full sm:w-56 rounded-xl" />
+          <Skeleton className="h-10 sm:h-12 w-full sm:w-48 rounded-xl" />
         </div>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-48 w-full rounded-2xl" />
+            <Skeleton key={i} className="h-40 sm:h-48 w-full rounded-xl sm:rounded-2xl" />
           ))}
         </div>
       </div>
@@ -157,47 +157,49 @@ export default function LawyerMarketplace() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Case Marketplace</h1>
-          <p className="text-muted-foreground mt-1">Browse and submit quotes for legal cases</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">Case Marketplace</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">Browse and submit quotes for legal cases</p>
         </div>
-        <Button variant="outline" onClick={() => navigate('/lawyer/quotes')}>
+        <Button variant="outline" onClick={() => navigate('/lawyer/quotes')} className="w-full sm:w-auto">
           <FileText className="w-4 h-4 mr-2" />
           My Quotes
         </Button>
       </div>
 
-      <div className="flex gap-4 items-center flex-wrap border rounded-lg p-4">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center sm:flex-wrap border rounded-lg p-3 sm:p-4">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-muted-foreground" />
           <span className="text-sm font-medium text-muted-foreground">Filters:</span>
         </div>
-        <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value || 'All')}>
-          <SelectTrigger className="w-48">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {CASE_CATEGORIES.map((category) => (
-              <SelectItem key={category.value} value={category.value}>
-                {category.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={dateFilter} onValueChange={(value) => setDateFilter(value || 'all')}>
-          <SelectTrigger className="w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {DATE_FILTERS.map((filter) => (
-              <SelectItem key={filter.value} value={filter.value}>
-                {filter.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
+          <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value || 'All')}>
+            <SelectTrigger className="w-full sm:w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CASE_CATEGORIES.map((category) => (
+                <SelectItem key={category.value} value={category.value}>
+                  {category.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={dateFilter} onValueChange={(value) => setDateFilter(value || 'all')}>
+            <SelectTrigger className="w-full sm:w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {DATE_FILTERS.map((filter) => (
+                <SelectItem key={filter.value} value={filter.value}>
+                  {filter.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {cases?.items.length === 0 ? (
@@ -226,8 +228,8 @@ export default function LawyerMarketplace() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-muted-foreground line-clamp-3">{redactSensitiveInfo(caseItem.description)}</p>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <MessageSquare className="w-4 h-4" />
                       {caseItem.quoteCount} quotes
@@ -238,12 +240,13 @@ export default function LawyerMarketplace() {
                     </span>
                   </div>
                   {caseItem.hasSubmittedQuote ? (
-                    <Badge variant="default">
+                    <Badge variant="default" className="w-fit">
                       <CheckCircle2 className="w-3 h-3 mr-1" />
                       Quote Submitted
                     </Badge>
                   ) : (
                     <Button
+                      className="w-full sm:w-auto"
                       onClick={() => {
                         setSelectedCase(caseItem.id)
                         setDialogOpen(true)

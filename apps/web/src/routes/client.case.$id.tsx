@@ -178,10 +178,10 @@ export default function ClientCaseDetail() {
 
   if (sessionLoading || isLoading) {
     return (
-      <div className="container mx-auto py-8 space-y-6">
-        <Skeleton className="h-12 w-64" />
-        <Skeleton className="h-64 w-full" />
-        <Skeleton className="h-32 w-full" />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-4 sm:space-y-6">
+        <Skeleton className="h-10 sm:h-12 w-48 sm:w-64" />
+        <Skeleton className="h-48 sm:h-64 w-full rounded-xl" />
+        <Skeleton className="h-24 sm:h-32 w-full rounded-xl" />
       </div>
     )
   }
@@ -196,18 +196,18 @@ export default function ClientCaseDetail() {
   const isPaid = paymentStatus?.status === 'succeeded'
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-4 sm:space-y-6">
       {/* Success Banner for Engaged Cases */}
       {isEngaged && isPaid && (
         <Card className="border-green-500 bg-green-50 dark:bg-green-950">
-          <CardContent className="py-4">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">✅</span>
+          <CardContent className="py-3 sm:py-4">
+            <div className="flex items-start sm:items-center gap-3">
+              <span className="text-xl sm:text-2xl">✅</span>
               <div>
-                <p className="font-semibold text-green-700 dark:text-green-300">
+                <p className="font-semibold text-sm sm:text-base text-green-700 dark:text-green-300">
                   Payment Successful - Lawyer Assigned
                 </p>
-                <p className="text-sm text-green-600 dark:text-green-400">
+                <p className="text-xs sm:text-sm text-green-600 dark:text-green-400">
                   Your lawyer now has access to your case documents and will begin working on your case.
                 </p>
               </div>
@@ -216,27 +216,28 @@ export default function ClientCaseDetail() {
         </Card>
       )}
 
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">{caseInfo.title}</h1>
-          <p className="text-muted-foreground">{caseInfo.category}</p>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
+        <div className="space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">{caseInfo.title}</h1>
+            <Badge
+              variant={
+                caseInfo.status === 'open'
+                  ? 'default'
+                  : caseInfo.status === 'engaged'
+                    ? 'secondary'
+                    : 'outline'
+              }
+              className="text-xs"
+            >
+              {caseInfo.status}
+            </Badge>
+          </div>
+          <p className="text-sm sm:text-base text-muted-foreground">{caseInfo.category}</p>
         </div>
-        <div className="flex items-center gap-4">
-          <Badge
-            variant={
-              caseInfo.status === 'open'
-                ? 'default'
-                : caseInfo.status === 'engaged'
-                  ? 'secondary'
-                  : 'outline'
-            }
-          >
-            {caseInfo.status}
-          </Badge>
-          <Button variant="outline" onClick={() => navigate('/client/dashboard')}>
-            Back to Dashboard
-          </Button>
-        </div>
+        <Button variant="outline" onClick={() => navigate('/client/dashboard')} className="w-full sm:w-auto">
+          Back to Dashboard
+        </Button>
       </div>
 
       {/* Case Description */}
@@ -266,15 +267,15 @@ export default function ClientCaseDetail() {
               {files.map((file: FileItem) => (
                 <div
                   key={file.id}
-                  className="flex items-center justify-between p-3 border rounded-lg"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 border rounded-lg"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-xl sm:text-2xl shrink-0">
                       {file.mimeType === 'application/pdf' ? '📄' : '🖼️'}
                     </span>
-                    <div>
-                      <p className="font-medium">{file.originalFilename}</p>
-                      <p className="text-sm text-muted-foreground">
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm sm:text-base truncate">{file.originalFilename}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         {(file.fileSize / 1024 / 1024).toFixed(2)} MB
                       </p>
                     </div>
@@ -282,6 +283,7 @@ export default function ClientCaseDetail() {
                   <Button
                     variant="outline"
                     size="sm"
+                    className="w-full sm:w-auto shrink-0"
                     onClick={() => handleDownloadFile(file.storageKey, file.originalFilename)}
                   >
                     Download
@@ -321,7 +323,7 @@ export default function ClientCaseDetail() {
                 return (
                   <div
                     key={quote.id}
-                    className={`p-4 border rounded-lg ${
+                    className={`p-3 sm:p-4 border rounded-lg ${
                       isAccepted 
                         ? 'border-green-500 bg-green-50 dark:bg-green-950' 
                         : isRejected
@@ -329,13 +331,13 @@ export default function ClientCaseDetail() {
                           : ''
                     }`}
                   >
-                    <div className="flex justify-between items-start">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                       <div className="space-y-2">
-                        <div className="flex items-center gap-4">
-                          <span className="text-2xl font-bold">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                          <span className="text-xl sm:text-2xl font-bold">
                             ${parseFloat(quote.amount).toLocaleString()}
                           </span>
-                          <Badge variant="outline">{quote.expectedDays} days</Badge>
+                          <Badge variant="outline" className="text-xs">{quote.expectedDays} days</Badge>
                           <Badge
                             variant={
                               isAccepted
@@ -344,25 +346,26 @@ export default function ClientCaseDetail() {
                                   ? 'destructive'
                                   : 'secondary'
                             }
+                            className="text-xs"
                           >
                             {isAccepted && isPaid ? '✓ Paid' : quote.status}
                           </Badge>
                         </div>
                         {quote.note && (
-                          <p className="text-sm text-muted-foreground">{quote.note}</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">{quote.note}</p>
                         )}
                         <p className="text-xs text-muted-foreground">
                           Received {new Date(quote.createdAt).toLocaleDateString()}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         {isAccepted && isPaid && (
-                          <span className="text-sm text-green-600 font-medium">
+                          <span className="text-xs sm:text-sm text-green-600 font-medium text-center sm:text-left">
                             ✓ Payment Complete
                           </span>
                         )}
                         {isAccepted && isPending && (
-                          <span className="text-sm text-yellow-600 font-medium">
+                          <span className="text-xs sm:text-sm text-yellow-600 font-medium text-center sm:text-left">
                             Payment Processing...
                           </span>
                         )}
@@ -370,6 +373,7 @@ export default function ClientCaseDetail() {
                           <Button
                             onClick={() => handleAcceptQuote(quote.id)}
                             disabled={createPaymentIntentMutation.isPending}
+                            className="w-full sm:w-auto"
                           >
                             Accept & Pay
                           </Button>

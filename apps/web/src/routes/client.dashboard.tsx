@@ -38,17 +38,17 @@ export default function ClientDashboard() {
 
   if (sessionLoading || isLoading) {
     return (
-      <div className="container mx-auto py-8 space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <Skeleton className="h-10 w-48 mb-2" />
-            <Skeleton className="h-5 w-64" />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-8 sm:h-10 w-40 sm:w-48" />
+            <Skeleton className="h-4 sm:h-5 w-56 sm:w-64" />
           </div>
-          <Skeleton className="h-12 w-40 rounded-xl" />
+          <Skeleton className="h-10 sm:h-12 w-full sm:w-40 rounded-xl" />
         </div>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-48 w-full rounded-2xl" />
+            <Skeleton key={i} className="h-40 sm:h-48 w-full rounded-xl sm:rounded-2xl" />
           ))}
         </div>
       </div>
@@ -60,13 +60,13 @@ export default function ClientDashboard() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
-      <div className="flex justify-between items-center">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">My Cases</h1>
-          <p className="text-muted-foreground mt-1">Manage your legal case requests</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">My Cases</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">Manage your legal case requests</p>
         </div>
-        <Button onClick={() => navigate('/client/create-case')}>
+        <Button onClick={() => navigate('/client/create-case')} className="w-full sm:w-auto">
           <Plus className="w-4 h-4 mr-2" />
           Create New Case
         </Button>
@@ -99,24 +99,25 @@ export default function ClientDashboard() {
                 }`}
                 onClick={() => navigate(`/client/case/${caseItem.id}`)}
               >
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-1">
-                      <CardTitle>{caseItem.title}</CardTitle>
-                      <CardDescription>{caseItem.category}</CardDescription>
+                <CardHeader className="pb-3 sm:pb-4">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-4">
+                    <div className="space-y-1 min-w-0">
+                      <CardTitle className="text-base sm:text-lg truncate">{caseItem.title}</CardTitle>
+                      <CardDescription className="text-xs sm:text-sm">{caseItem.category}</CardDescription>
                     </div>
                     <Badge
                       variant={isEngaged ? 'default' : isOpen ? 'secondary' : 'outline'}
+                      className="w-fit shrink-0 text-xs"
                     >
                       {isEngaged && <CheckCircle2 className="w-3 h-3 mr-1" />}
                       {isEngaged ? 'Lawyer Assigned' : caseItem.status.charAt(0).toUpperCase() + caseItem.status.slice(1)}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm text-muted-foreground line-clamp-2">{caseItem.description}</p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <CardContent className="space-y-3 sm:space-y-4 pt-0">
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{caseItem.description}</p>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <FileText className="w-4 h-4" />
                         {caseItem.fileCount} files
@@ -133,6 +134,7 @@ export default function ClientDashboard() {
                     <Button 
                       variant="ghost" 
                       size="sm"
+                      className="w-full sm:w-auto"
                       onClick={(e) => {
                         e.stopPropagation()
                         navigate(`/client/case/${caseItem.id}`)

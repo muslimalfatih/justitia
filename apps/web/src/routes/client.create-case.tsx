@@ -130,9 +130,6 @@ export default function CreateCase() {
     <div className="container mx-auto py-8 max-w-2xl">
       <Card>
         <CardHeader className="text-center">
-          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
-            <Plus className="w-6 h-6 text-primary" />
-          </div>
           <CardTitle>Create New Case</CardTitle>
           <CardDescription>Submit your legal case for lawyer quotes</CardDescription>
         </CardHeader>
@@ -196,7 +193,7 @@ export default function CreateCase() {
             <div className="space-y-2">
               <Label htmlFor="files">Supporting Documents</Label>
               <div className="relative">
-                <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/50 transition-colors cursor-pointer">
+                <div className="border-2 border-dashed rounded-lg p-4 sm:p-6 text-center hover:border-primary/50 transition-colors cursor-pointer">
                   <input
                     id="files"
                     type="file"
@@ -205,8 +202,8 @@ export default function CreateCase() {
                     onChange={handleFileChange}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   />
-                  <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground mb-1">
+                  <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">
                     Drag and drop files here, or click to browse
                   </p>
                   <p className="text-xs text-muted-foreground">
@@ -236,12 +233,13 @@ export default function CreateCase() {
               )}
             </div>
 
-            <div className="flex gap-3 pt-4">
+            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => navigate('/client/dashboard')}
                 disabled={createCaseMutation.isPending || uploading}
+                className="w-full sm:w-auto"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Cancel
@@ -249,7 +247,7 @@ export default function CreateCase() {
               <Button 
                 type="submit" 
                 disabled={createCaseMutation.isPending || uploading} 
-                className="flex-1"
+                className="w-full sm:flex-1"
               >
                 {createCaseMutation.isPending || uploading ? (
                   <>
