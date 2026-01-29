@@ -151,6 +151,11 @@ app.get("/", (c) => {
   return c.text("OK");
 });
 
+// Health check endpoint for Render
+app.get("/health", (c) => {
+  return c.json({ status: "healthy", timestamp: new Date().toISOString() });
+});
+
 export default {
   port: env.PORT,
   fetch: app.fetch,

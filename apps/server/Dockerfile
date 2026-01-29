@@ -1,0 +1,39 @@
+# Use official Bun image
+FROM oven/bun:1.2.1 AS base
+WORKDIR /app
+
+# Install dependencies
+FROM base AS deps
+COPY package.json bun.lock ./
+COPY apps/server/package.json ./apps/server/
+COPY packages/api/package.json ./packages/api/
+COPY packages/auth/package.json ./packages/auth/
+COPY packages/db/package.json ./packages/db/
+COPY packages/env/package.json ./packages/env/
+COPY packages/services/package.json ./packages/services/
+COPY packages/config/package.json ./packages/config/
+RUN bun install --frozen-lockfile
+
+# Build stage
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN cd apps/server && bun run build
+
+# Production stage
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Copy built files and dependencies
+COPY --from=builder /app/apps/server/dist ./apps/server/dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages ./packages
+COPY --from=builder /app/package.json ./
+
+# Expose port
+EXPOSE 3000
+
+# Start the server
+CMD ["bun", "run", "apps/server/dist/index.mjs"]

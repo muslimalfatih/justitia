@@ -1,0 +1,16 @@
+[build]
+  command = "cd apps/web && bun install && bun run build"
+  publish = "apps/web/build/client"
+
+[build.environment]
+  NODE_VERSION = "24.10.0"
+  BUN_VERSION = "1.2.1"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Add these environment variables in Netlify dashboard:
+# - VITE_SERVER_URL (your Render backend URL, e.g., https://justitia-api.onrender.com)
+# - VITE_STRIPE_PUBLISHABLE_KEY

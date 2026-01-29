@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: justitia-api
+    runtime: docker
+    dockerfilePath: ./apps/server/Dockerfile
+    dockerContext: .
+    branch: main
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      # Add these manually in Render dashboard:
+      # - DATABASE_URL
+      # - BETTER_AUTH_SECRET
+      # - BETTER_AUTH_URL (set to your Render URL)
+      # - CORS_ORIGIN (set to your Netlify URL)
+      # - CLOUDFLARE_ACCOUNT_ID
+      # - R2_ACCESS_KEY_ID
+      # - R2_SECRET_ACCESS_KEY
+      # - R2_BUCKET_NAME
+      # - STRIPE_SECRET_KEY
+      # - STRIPE_WEBHOOK_SECRET
