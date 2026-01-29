@@ -133,7 +133,7 @@ export default function ClientCaseDetail() {
       { caseId: caseId! },
       { 
         enabled: !!caseId,
-        refetchInterval: caseData?.case?.status === 'engaged' ? 3000 : false, // Poll every 3s when engaged
+        refetchInterval: 3000, // Poll every 3s to keep payment status updated
       }
     )
   )
@@ -161,6 +161,9 @@ export default function ClientCaseDetail() {
     toast.success('Payment successful! The lawyer will now have access to your case.')
     queryClient.invalidateQueries({ queryKey: ['cases', 'getCaseById'] })
     queryClient.invalidateQueries({ queryKey: ['quotes', 'getQuotesForCase'] })
+    queryClient.invalidateQueries({ queryKey: ['payments', 'getPaymentStatus'] })
+    // Also refetch immediately
+    refetchPaymentStatus()
   }
 
   const handleDownloadFile = async (storageKey: string, filename: string) => {
