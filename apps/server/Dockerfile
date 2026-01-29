@@ -12,7 +12,7 @@ COPY packages/db/package.json ./packages/db/
 COPY packages/env/package.json ./packages/env/
 COPY packages/services/package.json ./packages/services/
 COPY packages/config/package.json ./packages/config/
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Build stage
 FROM base AS builder
