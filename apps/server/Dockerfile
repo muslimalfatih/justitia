@@ -2,22 +2,13 @@
 FROM oven/bun:1.3.0 AS base
 WORKDIR /app
 
-# Install dependencies
-FROM base AS deps
-COPY package.json bun.lock ./
-COPY apps/server/package.json ./apps/server/
-COPY packages/api/package.json ./packages/api/
-COPY packages/auth/package.json ./packages/auth/
-COPY packages/db/package.json ./packages/db/
-COPY packages/env/package.json ./packages/env/
-COPY packages/services/package.json ./packages/services/
-COPY packages/config/package.json ./packages/config/
-RUN bun install
-
-# Build stage
+# Build stage - install deps and build in one stage
 FROM base AS builder
-COPY --from=deps /app/node_modules ./node_modules
+
+# Copy everything
 COPY . .
+
+# Install all dependencies and build
 RUN bun install && cd apps/server && bun run build
 
 # Production stage
@@ -26,22 +17,14 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy package files for production install
-COPY package.json bun.lock ./
-COPY apps/server/package.json ./apps/server/
-COPY packages/api/package.json ./packages/api/
-COPY packages/auth/package.json ./packages/auth/
-COPY packages/db/package.json ./packages/db/
-COPY packages/env/package.json ./packages/env/
-COPY packages/services/package.json ./packages/services/
-COPY packages/config/package.json ./packages/config/
+# Copy node_modules from builder (includes all deps)
+COPY --from=builder /app/node_modules ./node_modules
 
-# Install production dependencies
-RUN bun install --production
-
-# Copy built files and packages source
+# Copy built server
 COPY --from=builder /app/apps/server/dist ./apps/server/dist
-COPY --from=builder /app/packages ./packages
+
+# Copy package.json for bun to resolve workspace
+COPY --from=builder /app/package.json ./
 
 # Expose port
 EXPOSE 3000
