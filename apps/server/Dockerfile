@@ -26,11 +26,22 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy built files and dependencies
+# Copy package files for production install
+COPY package.json bun.lock ./
+COPY apps/server/package.json ./apps/server/
+COPY packages/api/package.json ./packages/api/
+COPY packages/auth/package.json ./packages/auth/
+COPY packages/db/package.json ./packages/db/
+COPY packages/env/package.json ./packages/env/
+COPY packages/services/package.json ./packages/services/
+COPY packages/config/package.json ./packages/config/
+
+# Install production dependencies
+RUN bun install --production
+
+# Copy built files and packages source
 COPY --from=builder /app/apps/server/dist ./apps/server/dist
-COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages ./packages
-COPY --from=builder /app/package.json ./
 
 # Expose port
 EXPOSE 3000
