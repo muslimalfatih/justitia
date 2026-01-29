@@ -133,7 +133,9 @@ export default function ClientCaseDetail() {
       { caseId: caseId! },
       { 
         enabled: !!caseId,
-        refetchInterval: 3000, // Poll every 3s to keep payment status updated
+        // Stop polling once payment succeeded
+        refetchInterval: (query) => 
+          query.state.data?.status === 'succeeded' ? false : 3000,
       }
     )
   )

@@ -1,6 +1,6 @@
 import Stripe from 'stripe'
 import { env } from '@justitia/env/server'
-import { db, payments, quotes, cases, eq, and } from '@justitia/db'
+import { db, payments, quotes, cases, eq, and, desc } from '@justitia/db'
 import { TRPCError } from '@trpc/server'
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
@@ -204,9 +204,28 @@ export function verifyWebhookSignature(
 
 /**
  * Get payment status for a case
+ * Prioritizes succeeded payment, then latest by date
  */
 export async function getPaymentStatus(caseId: string, userId: string) {
-  const payment = await db
+  // First, try to find a succeeded payment
+  const succeededPayment = await db
+    .select()
+    .from(payments)
+    .where(
+      and(
+        eq(payments.caseId, caseId),
+        eq(payments.clientId, userId),
+        eq(payments.status, 'succeeded')
+      )
+    )
+    .limit(1)
+
+  if (succeededPayment[0]) {
+    return succeededPayment[0]
+  }
+
+  // If no succeeded payment, get the latest one
+  const latestPayment = await db
     .select()
     .from(payments)
     .where(
@@ -215,7 +234,8 @@ export async function getPaymentStatus(caseId: string, userId: string) {
         eq(payments.clientId, userId)
       )
     )
+    .orderBy(desc(payments.createdAt))
     .limit(1)
 
-  return payment[0] || null
+  return latestPayment[0] || null
 }
