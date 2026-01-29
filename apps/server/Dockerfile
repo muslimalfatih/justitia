@@ -11,23 +11,17 @@ COPY . .
 # Install all dependencies and build
 RUN bun install && cd apps/server && bun run build
 
-# Production stage
+# Production stage - minimal image
 FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy node_modules from builder (includes all deps)
-COPY --from=builder /app/node_modules ./node_modules
-
-# Copy built server
-COPY --from=builder /app/apps/server/dist ./apps/server/dist
-
-# Copy package.json for bun to resolve workspace
-COPY --from=builder /app/package.json ./
+# Copy only the built files (everything is bundled)
+COPY --from=builder /app/apps/server/dist ./dist
 
 # Expose port
 EXPOSE 3000
 
 # Start the server
-CMD ["bun", "run", "apps/server/dist/index.mjs"]
+CMD ["bun", "run", "dist/index.mjs"]
