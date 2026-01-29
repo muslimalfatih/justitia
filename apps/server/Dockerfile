@@ -18,7 +18,7 @@ RUN bun install
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN cd apps/server && bun run build
+RUN bun install && cd apps/server && bun run build
 
 # Production stage
 FROM base AS runner
