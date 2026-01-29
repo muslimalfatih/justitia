@@ -9,6 +9,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -46,6 +47,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const location = useLocation();
+  const isHomepage = location.pathname === "/";
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider
@@ -55,8 +59,8 @@ export default function App() {
         disableTransitionOnChange
         storageKey="vite-ui-theme"
       >
-        <div className="grid grid-rows-[auto_1fr] h-svh">
-          <Header />
+        <div className="grid grid-rows-[auto_1fr] min-h-svh">
+          <Header transparent={isHomepage} />
           <Outlet />
         </div>
         <Toaster richColors />

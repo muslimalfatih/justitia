@@ -127,15 +127,15 @@ export default function LawyerQuotes() {
       <Tabs value={statusFilter} onValueChange={(v) => setStatusFilter(v as QuoteStatus)}>
         <TabsList>
           <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="proposed">
+          <TabsTrigger value="proposed" className="data-[state=active]:text-amber-600 data-[state=active]:bg-amber-50 dark:data-[state=active]:bg-amber-950/30">
             <AlertCircle className="w-4 h-4 mr-1" />
             Proposed
           </TabsTrigger>
-          <TabsTrigger value="accepted">
+          <TabsTrigger value="accepted" className="data-[state=active]:text-green-600 data-[state=active]:bg-green-50 dark:data-[state=active]:bg-green-950/30">
             <CheckCircle2 className="w-4 h-4 mr-1" />
             Accepted
           </TabsTrigger>
-          <TabsTrigger value="rejected">
+          <TabsTrigger value="rejected" className="data-[state=active]:text-red-600 data-[state=active]:bg-red-50 dark:data-[state=active]:bg-red-950/30">
             <XCircle className="w-4 h-4 mr-1" />
             Rejected
           </TabsTrigger>

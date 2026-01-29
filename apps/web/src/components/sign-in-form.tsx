@@ -141,7 +141,7 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
                     ) : (
                       <>
                         Sign In
-                        <ArrowRight className="h-4 w-4 ml-2" />
+                        <ArrowRight className="h-4 w-4" />
                       </>
                     )}
                   </Button>
